@@ -29,7 +29,25 @@ SECRET_KEY = 'django-insecure-ywrh*5#za%au7t7$#^sz(*q6_776fv$8(f0b#vaxghlu7d9ydl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
+CORS_ALLOW_ALL_ORIGINS = True
+
+
+CSRF_TRUSTED_ORIGINS = [
+
+  'http://127.0.0.1:5500',
+
+  'http://localhost:5500',
+
+]
+
+CORS_ALLOWED_ORIGINS = [
+
+  'http://127.0.0.1:5500',
+
+  'http://localhost:5500',
+
+]
 
 
 # Application definition
@@ -43,6 +61,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    # 'movie',
+    'movie.apps.MovieConfig',
     'userprofile'
 ]
 
