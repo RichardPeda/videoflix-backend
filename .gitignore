@@ -1,0 +1,5 @@
+
+.codegpt
+/env
+/media
+db.sqlite3
