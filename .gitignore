@@ -1,5 +1,11 @@
 
 .codegpt
 /env
+/env_lin
 */media
 db.sqlite3
+
+*.log
+*.pot
+*.pyc
+__pycache__

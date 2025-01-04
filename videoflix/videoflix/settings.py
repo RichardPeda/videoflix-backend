@@ -88,9 +88,10 @@ MIDDLEWARE = [
 RQ_QUEUES = {
     'default': {
         'HOST': 'localhost',
+        # 'HOST': '192.168.56.1',
         'PORT': 6379,
         'DB': 0,
-        'USERNAME': 'some-user',
+        # 'USERNAME': 'some-user',
         'PASSWORD': 'foobared',
         'DEFAULT_TIMEOUT': 360,
     },
