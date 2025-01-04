@@ -49,6 +49,12 @@ CORS_ALLOWED_ORIGINS = [
 
 ]
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+CACHE_TTL = 60 * 15
+
 
 # Application definition
 
@@ -61,12 +67,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    # 'movie',
+    'debug_toolbar',
+    'django_rq',
     'movie.apps.MovieConfig',
     'userprofile'
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -76,6 +84,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'USERNAME': 'some-user',
+        'PASSWORD': 'foobared',
+        'DEFAULT_TIMEOUT': 360,
+    },
+}
 
 ROOT_URLCONF = 'videoflix.urls'
 
@@ -94,6 +113,18 @@ TEMPLATES = [
         },
     },
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+        "PASSWORD": "foobared",
+        "CLIENT_CLASS": "django_redis.client.DefaultClient"
+    },
+    "KEY_PREFIX": "videoflix"
+    }
+}
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'
 

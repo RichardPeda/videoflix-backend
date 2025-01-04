@@ -2,16 +2,18 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+from django.views.decorators.cache import cache_page, cache_control
+from django.utils.decorators import method_decorator
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.conf import settings
 from movie.models import Movie
 from movie.api.serializers import MovieSerializer
 
 
-
-
-
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 class MovieView(APIView):
+      @method_decorator(cache_page(CACHE_TTL))
       def get(self, request):
         """
         This endpoint returns a all movies.
