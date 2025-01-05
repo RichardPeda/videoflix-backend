@@ -99,6 +99,15 @@ RQ_QUEUES = {
 
 ROOT_URLCONF = 'videoflix.urls'
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get('VIDEOFLIX_EMAIL_HOST')
+EMAIL_FROM = 'videoflix@richard-peda.de'
+EMAIL_HOST_USER = 'videoflix@richard-peda.de'
+EMAIL_HOST_PASSWORD = os.environ.get('VIDEOFLIX_EMAIL_PW')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
