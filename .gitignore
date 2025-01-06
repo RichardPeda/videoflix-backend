@@ -1,6 +1,7 @@
 
 .codegpt
 /env
+*.env
 /env_lin
 */media
 db.sqlite3
