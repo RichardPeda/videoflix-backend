@@ -9,3 +9,10 @@ class Movie(models.Model):
     duration = models.FloatField()
     image_url = models.FileField(upload_to='uploads/images/', null=True, blank=True)
     video_url = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
+    
+class MovieConvertables(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='movie_convertables')
+    video_120p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
+    video_360p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
+    video_720p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
+    video_1080p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
