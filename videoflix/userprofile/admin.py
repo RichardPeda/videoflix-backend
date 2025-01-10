@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from userprofile.models import UserProfile, Review
+from .models import CustomUser, VerifyCode
 
-# Register your models here.
-admin.site.register(UserProfile)
-admin.site.register(Review)
+admin.site.register(CustomUser)
+admin.site.register(VerifyCode)

@@ -20,13 +20,21 @@ from django.urls import include
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 from movie.api.views import MovieView
+from userprofile.api.views import RegisterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('api/register/', RegisterView.as_view(), name='register'),
+
+
     path('api/movies/', MovieView.as_view(), name='movies')
+
 ] + debug_toolbar_urls()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-urlpatterns += [path('django-rq/', include('django_rq.urls'))]
+urlpatterns += staticfiles_urlpatterns()
+

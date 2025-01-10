@@ -34,7 +34,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['localhost','127.0.0.1']
 CORS_ALLOW_ALL_ORIGINS = True
 
-
 CSRF_TRUSTED_ORIGINS = [
 
   'http://127.0.0.1:5500',
@@ -69,8 +68,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_celery_results',
     'debug_toolbar',
-    'django_rq',
     'movie.apps.MovieConfig',
     'userprofile'
 ]
@@ -87,17 +86,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-RQ_QUEUES = {
-    'default': {
-        'HOST': 'localhost',
-        # 'HOST': '192.168.56.1',
-        'PORT': 6379,
-        'DB': 0,
-        # 'USERNAME': 'some-user',
-        'PASSWORD': 'foobared',
-        'DEFAULT_TIMEOUT': 360,
-    },
-}
 
 ROOT_URLCONF = 'videoflix.urls'
 
@@ -113,7 +101,7 @@ EMAIL_USE_TLS = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -170,6 +158,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'userprofile.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -192,3 +181,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = 'redis://:foobared@localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'

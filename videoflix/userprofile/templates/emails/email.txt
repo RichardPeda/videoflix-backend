@@ -1,0 +1,3 @@
+Hello {{username}},
+
+please verify your email veryfy/?user_id={{user_id}}&code={{code}}
