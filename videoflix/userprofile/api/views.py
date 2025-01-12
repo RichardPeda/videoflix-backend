@@ -18,7 +18,25 @@ from rest_framework.filters import OrderingFilter
 from rest_framework import serializers
 from ..tasks import send_email_to_user
 
+class LoginOrSignupView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
 
+        if(email is not None):
+            try:
+                user = CustomUser.objects.get(email=email)
+                return Response(data={'message' : 'user exists', 'email' : user.email}, status=status.HTTP_200_OK)
+            except:
+                print('resp')
+            return Response(data={'message' : 'user does not exist'}, status=status.HTTP_200_OK)
+        else:
+            return Response(data={'message' : 'wrong information'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        
+                  
+
+        
 
 class LoginView(ObtainAuthToken):
     

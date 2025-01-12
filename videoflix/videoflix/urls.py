@@ -24,11 +24,12 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 from movie.api.views import MovieView
-from userprofile.api.views import RegisterView
+from userprofile.api.views import LoginOrSignupView, RegisterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    path('api/login-signup/', LoginOrSignupView.as_view(), name='login-signup'),
     path('api/register/', RegisterView.as_view(), name='register'),
 
 
