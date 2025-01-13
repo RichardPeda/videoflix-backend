@@ -16,7 +16,7 @@ from rest_framework.filters import OrderingFilter
 # from django_filters.rest_framework import DjangoFilterBackend
 # from drf_spectacular.utils import extend_schema, extend_schema_serializer, inline_serializer
 from rest_framework import serializers
-from ..tasks import send_email_to_user
+from ..tasks import send_verification_email_to_user
 
 class LoginOrSignupView(APIView):
     def post(self, request):
@@ -87,7 +87,7 @@ class RegisterView(APIView):
             saved_account = serializer.save()
             code, created = VerifyCode.objects.get_or_create(user=saved_account)
            
-            send_email_to_user.delay(user_id=saved_account.id, code=code.id)
+            send_verification_email_to_user.delay(user_id=saved_account.id, code=code.id)
 
             return Response({
             'message': 'verification email was sent'
