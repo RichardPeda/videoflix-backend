@@ -61,7 +61,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         pw = self.validated_data['password']
         email = self.validated_data['email']
         username = self.validated_data['username']        
-        account = CustomUser(email=email, username=username)
+        account = CustomUser(email=email, username=username, is_active=False, is_verified=False)
         account.set_password(pw)
         account.save()
         return account

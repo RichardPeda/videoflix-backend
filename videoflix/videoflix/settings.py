@@ -60,6 +60,8 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
+FRONTEND_BASEURL = 'http://localhost:4200/'
+
 CACHE_TTL = 60 * 15
 
 
