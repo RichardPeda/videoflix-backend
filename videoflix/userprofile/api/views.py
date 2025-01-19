@@ -9,6 +9,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
+from rest_framework import status
 # from django_filters.rest_framework import DjangoFilterBackend
 # from django_filters import rest_framework as filters
 
@@ -94,4 +95,25 @@ class RegisterView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VerificationView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        req_user_id = request.data.get('user_id')
+        req_code = request.data.get('code')
+
+        try:
+            code = VerifyCode.objects.get(user=req_user_id, id=req_code)
+            user = code.user
+            user.is_verified = True
+            user.is_active = True
+            user.save()
+            code.delete()
+            
+            return Response({'message' : 'user verified'}, status=status.HTTP_200_OK)
+        except VerifyCode.DoesNotExist:
+            return Response({'error'}, status=status.HTTP_404_NOT_FOUND)
+
+        
     
