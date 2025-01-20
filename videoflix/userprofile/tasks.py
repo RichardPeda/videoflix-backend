@@ -27,3 +27,18 @@ def send_verification_email_to_user(code, user_id):
     )
     email.content_subtype = "html" 
     email.send()
+
+@shared_task
+def send_password_reset_email_to_user(code, user_id):
+    sender = settings.EMAIL_FROM
+    user = CustomUser.objects.get(id=user_id)
+    context = {'user_id': user_id, 'code':code, 'url':url}
+    html_content = render_to_string('emails/reset_password_email.html', context=context)
+    email = EmailMessage(
+        subject="Reset your Password", 
+        body=html_content, 
+        from_email=sender,
+        to=[user.email], 
+    )
+    email.content_subtype = "html" 
+    email.send()

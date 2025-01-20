@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from userprofile.api.permissions import IsCustomerCreateReview, IsOwnerOrAdmin, IsReviewerOrAdmin
 from userprofile.api.serializers import RegistrationSerializer
-from userprofile.models import CustomUser, VerifyCode
+from userprofile.models import CustomUser, VerifyCode, PasswordResetCode
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
@@ -17,7 +17,7 @@ from rest_framework.filters import OrderingFilter
 # from django_filters.rest_framework import DjangoFilterBackend
 # from drf_spectacular.utils import extend_schema, extend_schema_serializer, inline_serializer
 from rest_framework import serializers
-from ..tasks import send_verification_email_to_user
+from ..tasks import send_password_reset_email_to_user, send_verification_email_to_user
 
 class LoginOrSignupView(APIView):
     def post(self, request):
@@ -113,7 +113,38 @@ class VerificationView(APIView):
             
             return Response({'message' : 'user verified'}, status=status.HTTP_200_OK)
         except VerifyCode.DoesNotExist:
-            return Response({'error'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
+class PasswordResetInquiryView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        """
+        A POST-request compares the given passwords and if the user or the email already exists.
+        This API provides endpoints for user login and registration.
+        Login provides the user with a token for authentication and registration creates a new user,
+        automatically assigning a customer or business user profile.
+        The function returns a JSON when is was successfull.
+
+        Args:
+            request (data): username: Username of the new user. Email: Email address of the new user.
+	        Password: Password for the new user. Repeated_password: Repetition of the password for confirmation.
+	        Type: Profile type (business or customer profile).
+
+        Returns:
+            JSON: Response with token, user id, email and username.
+        """
+        try:
+            user_email = request.data.get('email')
+            user = CustomUser.objects.get(email=user_email)
+            code, created = PasswordResetCode.objects.get_or_create(user=user)
+        
+            send_password_reset_email_to_user.delay(user_id=user.pk, code=code.id)
+
+            return Response({
+            'message': 'password reset email was sent'
+            }, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         
     
