@@ -31,8 +31,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         The email must not yet exist.
         The password and the repeaded_passwords must match.
         """
-
-        print(data)
         errors = {}
         username = data.get("username")
         if self.Meta.model.objects.filter(username__iexact=username).exists():

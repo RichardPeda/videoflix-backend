@@ -148,3 +148,29 @@ class PasswordResetInquiryView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
     
+class PasswordReset(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        req_user_id = request.data.get('user_id')
+        req_code = request.data.get('code')
+        req_code = request.data.get('code')
+        pw = request.data.get("password")
+        repeated_pw = request.data.get("repeated_password")
+        if(pw == repeated_pw):
+            try:
+                code = PasswordResetCode.objects.get(user=req_user_id, id=req_code)
+                user = code.user
+                user.set_password(pw)
+                user.save()
+                code.delete()
+
+                return Response({
+                'message': 'password reset successful'
+                }, status=status.HTTP_200_OK)
+            except:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        
