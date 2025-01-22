@@ -2,15 +2,8 @@ from rest_framework import serializers
 # from django.contrib.auth.models import User
 from ..models import CustomUser
 import datetime
+from django.contrib.auth import authenticate
 
-
-
-
-
-    
-  
-        
-    
 
 class RegistrationSerializer(serializers.ModelSerializer):
     repeated_password = serializers.CharField(write_only=True)
@@ -55,7 +48,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         Save a new user after the validation of the fields.
         """
 
-        print(self)
         pw = self.validated_data['password']
         email = self.validated_data['email']
         username = self.validated_data['username']        
@@ -63,3 +55,4 @@ class RegistrationSerializer(serializers.ModelSerializer):
         account.set_password(pw)
         account.save()
         return account
+    

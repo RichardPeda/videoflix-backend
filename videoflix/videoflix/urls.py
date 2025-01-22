@@ -24,12 +24,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 from movie.api.views import MovieView
-from userprofile.api.views import LoginOrSignupView, RegisterView, VerificationView, PasswordResetInquiryView, PasswordReset
+from userprofile.api.views import LoginOrSignupView, LoginView, RegisterView, VerificationView, PasswordResetInquiryView, PasswordReset
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
     path('api/login-signup/', LoginOrSignupView.as_view(), name='login-signup'),
+    path('api/login/', LoginView.as_view(), name='login'),
+
     path('api/register/', RegisterView.as_view(), name='register'),
     path('api/verification/', VerificationView.as_view(), name='verification'),
     path('api/password-reset-inquiry/', PasswordResetInquiryView.as_view(), name='password-reset-inquiry'),
