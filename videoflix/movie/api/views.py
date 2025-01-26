@@ -8,13 +8,20 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.conf import settings
 from movie.models import Movie
 from movie.api.serializers import MovieSerializer
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 class MovieView(APIView):
-      @method_decorator(cache_page(CACHE_TTL))
+      authentication_classes = [TokenAuthentication]
+      permission_classes = [IsAuthenticated]
+
+    #   @method_decorator(cache_page(CACHE_TTL))
       def get(self, request):
+        
         """
         This endpoint returns a all movies.
         
