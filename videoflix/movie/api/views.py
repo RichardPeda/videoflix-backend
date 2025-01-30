@@ -6,20 +6,21 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.utils.decorators import method_decorator
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.conf import settings
-from movie.models import Movie
-from movie.api.serializers import MovieSerializer
+from movie.models import Movie, MovieConvertables
+from movie.api.serializers import MovieSerializer, MovieConvertablesSerializer
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 class MovieView(APIView):
-      authentication_classes = [TokenAuthentication]
-      permission_classes = [IsAuthenticated]
+      # authentication_classes = [TokenAuthentication]
+      # permission_classes = [IsAuthenticated]
+      permission_classes = [AllowAny]
 
-    #   @method_decorator(cache_page(CACHE_TTL))
+      # @method_decorator(cache_page(CACHE_TTL))
       def get(self, request):
         
         """
@@ -33,7 +34,12 @@ class MovieView(APIView):
         """
         
         movies = Movie.objects.all()
-        
-        # self.check_object_permissions(request, offer_detail)
+        movies = movies.order_by('created_at')
         serializer = MovieSerializer(movies, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+      
+class MovieConvertablesView(APIView):
+    def get(self, request):
+        convertables = MovieConvertables.objects.all()
+        serializer = MovieConvertablesSerializer(convertables, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)

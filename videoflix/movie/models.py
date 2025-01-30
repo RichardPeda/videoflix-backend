@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 class Movie(models.Model):
     GENRE_CHOICES = {
@@ -17,6 +18,7 @@ class Movie(models.Model):
     duration = models.FloatField(default=0.0)
     image_url = models.FileField(upload_to='uploads/images/', null=True, blank=True)
     video_url = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
+    created_at = models.DateTimeField(default=now)
 
     def __str__(self):
         return f"{self.title}"

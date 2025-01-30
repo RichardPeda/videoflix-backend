@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from movie.models import Movie
+from movie.models import Movie, MovieConvertables
 
 class MovieSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField(method_name='get_image_url')   
@@ -17,4 +17,9 @@ class MovieSerializer(serializers.ModelSerializer):
 class MovieDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
+        fields = '__all__'
+
+class MovieConvertablesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MovieConvertables
         fields = '__all__'
