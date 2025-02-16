@@ -21,7 +21,7 @@ class Movie(models.Model):
     created_at = models.DateTimeField(default=now)
 
     def __str__(self):
-        return f"{self.title}"
+        return f"{self.id} {self.title}"
     
 class MovieConvertables(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='movie_convertables')
@@ -29,3 +29,6 @@ class MovieConvertables(models.Model):
     video_360p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
     video_720p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
     video_1080p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
+
+class ConnectionTestFile(models.Model):
+    file = models.FileField(upload_to='uploads/testfile/', null=True, blank=True)

@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
-from movie.api.views import MovieView, MovieConvertablesView
+from movie.api.views import ConnectionTestView, MovieView, MovieConvertablesView, SingleMovieConvertablesView
 from userprofile.api.views import LoginOrSignupView, LoginView, RegisterView, VerificationView, PasswordResetInquiryView, PasswordReset
 
 urlpatterns = [
@@ -38,7 +38,9 @@ urlpatterns = [
 
 
     path('api/movies/', MovieView.as_view(), name='movies'),
-    path('api/movies-convert/', MovieConvertablesView.as_view(), name='movies-convert')
+    path('api/connection/', ConnectionTestView.as_view(), name='connection'),
+    path('api/movies-convert/', MovieConvertablesView.as_view(), name='movies-convert'),
+    path('api/movie-convert/<int:pk>', SingleMovieConvertablesView.as_view(), name='movie-convert')
 
 ] + debug_toolbar_urls()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

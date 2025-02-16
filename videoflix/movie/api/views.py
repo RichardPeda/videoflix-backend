@@ -6,8 +6,8 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.utils.decorators import method_decorator
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.conf import settings
-from movie.models import Movie, MovieConvertables
-from movie.api.serializers import MovieSerializer, MovieConvertablesSerializer
+from movie.models import ConnectionTestFile, Movie, MovieConvertables
+from movie.api.serializers import MovieSerializer, MovieConvertablesSerializer, TestFileSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -42,4 +42,21 @@ class MovieConvertablesView(APIView):
     def get(self, request):
         convertables = MovieConvertables.objects.all()
         serializer = MovieConvertablesSerializer(convertables, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class SingleMovieConvertablesView(APIView):
+    def get(self, request, pk):
+        try:
+            convertables = MovieConvertables.objects.get(pk=pk)
+            print(f"convertables {convertables}")
+            serializer = MovieConvertablesSerializer(convertables, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+class ConnectionTestView(APIView):
+    def get(self, request):
+        testfile = ConnectionTestFile.objects.get(pk=1)
+        serializer = TestFileSerializer(testfile, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
