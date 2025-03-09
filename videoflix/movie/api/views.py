@@ -6,8 +6,8 @@ from django.views.decorators.cache import cache_page, cache_control
 from django.utils.decorators import method_decorator
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.conf import settings
-from movie.models import ConnectionTestFile, Movie, MovieConvertables
-from movie.api.serializers import MovieSerializer, MovieConvertablesSerializer, TestFileSerializer
+from movie.models import ConnectionTestFile, Movie, MovieConvertables, MovieProgress
+from movie.api.serializers import MovieSerializer, MovieConvertablesSerializer, TestFileSerializer, MovieProgressSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -60,3 +60,28 @@ class ConnectionTestView(APIView):
         testfile = ConnectionTestFile.objects.get(pk=1)
         serializer = TestFileSerializer(testfile, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class MovieProgressView(APIView):
+    authentication_classes = [TokenAuthentication]
+    def get(self, request):
+        try:
+            req_video = request.data.get('video_id')
+            req_user_id = request.user
+            progress = MovieProgress.objects.get(movie=req_video, user=req_user_id)
+            serializer = MovieProgressSerializer(progress)
+            return Response(serializer.data)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+    def post(self,request):
+        req_video = request.data.get('video_id')
+        req_time = request.data.get('time')
+        req_user_id = request.user
+        try:
+            progress, created = MovieProgress.objects.get_or_create(movie=req_video, user=req_user_id)
+            progress.time = req_time
+            progress.save()
+            return Response(status=status.HTTP_201_CREATED)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+            

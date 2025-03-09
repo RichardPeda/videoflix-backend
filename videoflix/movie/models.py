@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.timezone import now
 
+from userprofile.models import CustomUser
+
 class Movie(models.Model):
     GENRE_CHOICES = {
         "NEW": "New",
@@ -29,6 +31,13 @@ class MovieConvertables(models.Model):
     video_360p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
     video_720p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
     video_1080p = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
+
+class MovieProgress(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='movie_progress')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    time = models.DecimalField(max_digits=20, decimal_places=2)
+    created_at = models.DateTimeField(default=now, editable=False)
+    updated_at = models.DateTimeField(auto_now=True, editable=False)
 
 class ConnectionTestFile(models.Model):
     file = models.FileField(upload_to='uploads/testfile/', null=True, blank=True)

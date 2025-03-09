@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from movie.models import ConnectionTestFile, Movie, MovieConvertables
+from movie.models import ConnectionTestFile, Movie, MovieConvertables, MovieProgress
 
 class MovieSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField(method_name='get_image_url')   
@@ -27,4 +27,9 @@ class MovieConvertablesSerializer(serializers.ModelSerializer):
 class TestFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConnectionTestFile
+        fields = '__all__'
+
+class MovieProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MovieProgress
         fields = '__all__'
