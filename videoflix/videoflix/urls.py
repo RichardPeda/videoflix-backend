@@ -42,7 +42,7 @@ urlpatterns = [
     path('api/movies-convert/', MovieConvertablesView.as_view(), name='movies-convert'),
     path('api/movie-convert/<int:pk>', SingleMovieConvertablesView.as_view(), name='movie-convert'),
 
-    path('api/movie-progress/', MovieProgressView.as_view(), name='movie-progress')
+    path('api/movie-progress/<int:pk>', MovieProgressView.as_view(), name='movie-progress')
 
 ] + debug_toolbar_urls()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

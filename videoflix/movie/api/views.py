@@ -63,22 +63,21 @@ class ConnectionTestView(APIView):
     
 class MovieProgressView(APIView):
     authentication_classes = [TokenAuthentication]
-    def get(self, request):
-        try:
-            req_video = request.data.get('video_id')
+    def get(self, request, pk):
+        print(pk)
+        try: 
             req_user_id = request.user
-            progress = MovieProgress.objects.get(movie=req_video, user=req_user_id)
+            progress = MovieProgress.objects.get(movie=pk, user=req_user_id)
             serializer = MovieProgressSerializer(progress)
             return Response(serializer.data)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-    def post(self,request):
-        req_video = request.data.get('video_id')
+    def post(self,request, pk):
         req_time = request.data.get('time')
         req_user_id = request.user
         try:
-            progress, created = MovieProgress.objects.get_or_create(movie=req_video, user=req_user_id)
+            progress, created = MovieProgress.objects.get_or_create(movie=pk, user=req_user_id)
             progress.time = req_time
             progress.save()
             return Response(status=status.HTTP_201_CREATED)
