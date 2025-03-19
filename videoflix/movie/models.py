@@ -35,7 +35,7 @@ class MovieConvertables(models.Model):
 class MovieProgress(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='movie_progress')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    time = models.DecimalField(max_digits=20, decimal_places=2)
+    time = models.DecimalField(max_digits=20, decimal_places=2, null=True)
     created_at = models.DateTimeField(default=now, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 

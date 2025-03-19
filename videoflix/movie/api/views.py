@@ -60,27 +60,40 @@ class ConnectionTestView(APIView):
         testfile = ConnectionTestFile.objects.get(pk=1)
         serializer = TestFileSerializer(testfile, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
 class MovieProgressView(APIView):
     authentication_classes = [TokenAuthentication]
+    def get(self, request):
+        try: 
+            req_user_id = request.user
+            progress = MovieProgress.objects.filter(user=req_user_id)
+            print(progress)
+            serializer = MovieProgressSerializer(progress, many=True)
+            return Response(serializer.data)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+class MovieProgressSingleView(APIView):
+    authentication_classes = [TokenAuthentication]
     def get(self, request, pk):
-        print(pk)
         try: 
             req_user_id = request.user
             progress = MovieProgress.objects.get(movie=pk, user=req_user_id)
             serializer = MovieProgressSerializer(progress)
             return Response(serializer.data)
         except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         
     def post(self,request, pk):
         req_time = request.data.get('time')
         req_user_id = request.user
-        try:
-            progress, created = MovieProgress.objects.get_or_create(movie=pk, user=req_user_id)
-            progress.time = req_time
-            progress.save()
-            return Response(status=status.HTTP_201_CREATED)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        movie = Movie.objects.get(pk=pk)
+        
+        progress, created = MovieProgress.objects.get_or_create(movie=movie, user=req_user_id)
+        print(progress)
+        progress.time = req_time
+        progress.save()
+        return Response(status=status.HTTP_201_CREATED)
+        
+       
             

@@ -4,6 +4,7 @@
 *.env
 /env_lin
 */media
+*/uploads
 db.sqlite3
 
 *.log
