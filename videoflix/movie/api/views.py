@@ -16,11 +16,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 class MovieView(APIView):
-      # authentication_classes = [TokenAuthentication]
-      # permission_classes = [IsAuthenticated]
-      permission_classes = [AllowAny]
+      authentication_classes = [TokenAuthentication]
+      permission_classes = [IsAuthenticated]
 
-      # @method_decorator(cache_page(CACHE_TTL))
+      @method_decorator(cache_page(CACHE_TTL))
       def get(self, request):
         
         """
@@ -34,11 +33,13 @@ class MovieView(APIView):
         """
         
         movies = Movie.objects.all()
-        movies = movies.order_by('created_at')
+        movies = movies.order_by('-created_at')
         serializer = MovieSerializer(movies, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
       
 class MovieConvertablesView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         convertables = MovieConvertables.objects.all()
         serializer = MovieConvertablesSerializer(convertables, many=True, context={'request': request})
@@ -46,10 +47,11 @@ class MovieConvertablesView(APIView):
     
 
 class SingleMovieConvertablesView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         try:
             convertables = MovieConvertables.objects.get(pk=pk)
-            print(f"convertables {convertables}")
             serializer = MovieConvertablesSerializer(convertables, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
@@ -63,11 +65,11 @@ class ConnectionTestView(APIView):
 
 class MovieProgressView(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         try: 
             req_user_id = request.user
             progress = MovieProgress.objects.filter(user=req_user_id)
-            print(progress)
             serializer = MovieProgressSerializer(progress, many=True)
             return Response(serializer.data)
         except:
@@ -75,6 +77,7 @@ class MovieProgressView(APIView):
 
 class MovieProgressSingleView(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         try: 
             req_user_id = request.user
@@ -90,7 +93,6 @@ class MovieProgressSingleView(APIView):
         movie = Movie.objects.get(pk=pk)
         
         progress, created = MovieProgress.objects.get_or_create(movie=movie, user=req_user_id)
-        print(progress)
         progress.time = req_time
         progress.save()
         return Response(status=status.HTTP_201_CREATED)

@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
     repeated_password = serializers.CharField(write_only=True)
     
     class Meta:

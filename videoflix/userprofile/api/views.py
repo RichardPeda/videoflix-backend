@@ -28,8 +28,7 @@ class LoginOrSignupView(APIView):
                 user = CustomUser.objects.get(email=email)
                 return Response(data={'message' : 'user exists', 'email' : user.email}, status=status.HTTP_200_OK)
             except:
-                print('resp')
-            return Response(data={'message' : 'user does not exist'}, status=status.HTTP_200_OK)
+                return Response(data={'message' : 'user does not exist'}, status=status.HTTP_200_OK)
         else:
             return Response(data={'message' : 'wrong information'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -58,9 +57,11 @@ class LoginView(ObtainAuthToken):
                         'user_id': user.pk,
                         'email': user.email,
                     }, status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
              
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -132,43 +133,43 @@ class PasswordResetInquiryView(APIView):
         Returns:
             JSON: Response with token, user id, email and username.
         """
-        try:
-            user_email = request.data.get('email')
-            user = CustomUser.objects.get(email=user_email)
-            code, created = PasswordResetCode.objects.get_or_create(user=user)
         
-            send_password_reset_email_to_user.delay(user_id=user.pk, code=code.id)
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({
-            'message': 'password reset email was sent'
-            }, status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = CustomUser.objects.get(email=email)
+            code, created = PasswordResetCode.objects.get_or_create(user=user)
+            send_password_reset_email_to_user.delay(user_id=user.pk, code=code.id)
+        except CustomUser.DoesNotExist:
+            pass # Intentionally no error message → Protection against hackers
+        # Uniform response - even if the e-mail does not exist
+        return Response({'message': 'If an account with that email exists, a reset email was sent.'}, status=status.HTTP_200_OK)
         
-    
 class PasswordReset(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
-        req_user_id = request.data.get('user_id')
-        req_code = request.data.get('code')
-        req_code = request.data.get('code')
-        pw = request.data.get("password")
-        repeated_pw = request.data.get("repeated_password")
-        if(pw == repeated_pw):
-            try:
-                code = PasswordResetCode.objects.get(user=req_user_id, id=req_code)
-                user = code.user
-                user.set_password(pw)
-                user.save()
-                code.delete()
+        user_id = request.data.get('user_id')
+        code_id = request.data.get('code')
+        pw = request.data.get('password')
+        repeated_pw = request.data.get('repeated_password')
 
-                return Response({
-                'message': 'password reset successful'
-                }, status=status.HTTP_200_OK)
-            except:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not all([user_id, code_id, pw, repeated_pw]):
+            return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if pw != repeated_pw:
+            return Response({'error': 'Passwords do not match.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        
+        try:
+            code = PasswordResetCode.objects.get(user=user_id, id=code_id)
+        except PasswordResetCode.DoesNotExist:
+            return Response({'error': 'Invalid reset code or user.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = code.user
+        user.set_password(pw)
+        user.save()
+        code.delete()
+
+        return Response({'message': 'Password reset successful'}, status=status.HTTP_200_OK)
