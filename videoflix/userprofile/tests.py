@@ -1,9 +1,16 @@
+from django.conf import settings
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 from django.urls import reverse
 from userprofile.models import CustomUser, PasswordResetCode, VerifyCode
 import uuid
 from unittest.mock import patch
+
+from userprofile.tasks import send_password_reset_email_to_user, send_verification_email_to_user
+from unittest.mock import patch, MagicMock
+from django.test import RequestFactory, TestCase
+
+from userprofile.api.permissions import IsOwnerOrAdmin
 
 class LoginOrSignupTest(APITestCase):
 
@@ -242,3 +249,86 @@ class PasswordResetTest(APITestCase):
         response = self.client.post(self.url, {})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['error'], 'All fields are required.')
+
+# 
+
+class SendVerificationEmailTest(TestCase):
+
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username='verifyuser', email='verify@test.com', password='test123')
+        self.code = 1234  # Beispielcode
+
+    @patch('userprofile.tasks.EmailMessage')
+    @patch('userprofile.tasks.render_to_string', return_value='<p>test html</p>')
+    def test_send_verification_email(self, mock_render, mock_email_class):
+        mock_email_instance = MagicMock()
+        mock_email_class.return_value = mock_email_instance
+
+        send_verification_email_to_user(code=self.code, user_id=self.user.id)
+
+        mock_render.assert_called_once()
+        mock_email_class.assert_called_once_with(
+            subject="Confirm your email",
+            body='<p>test html</p>',
+            from_email=settings.EMAIL_FROM,
+            to=[self.user.email]
+        )
+        mock_email_instance.send.assert_called_once()
+
+class SendPasswordResetEmailTest(TestCase):
+
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username='resetuser', email='reset@test.com', password='reset123')
+        self.code = 5678
+        self.url = settings.FRONTEND_BASEURL
+
+    @patch('userprofile.tasks.EmailMessage')
+    @patch('userprofile.tasks.render_to_string', return_value='<p>reset email html</p>')
+    def test_send_password_reset_email(self, mock_render, mock_email_class):
+        mock_email_instance = MagicMock()
+        mock_email_class.return_value = mock_email_instance
+
+        send_password_reset_email_to_user(code=self.code, user_id=self.user.id)
+
+        mock_render.assert_called_once_with(
+            'emails/reset_password_email.html',
+            context={'user_id': self.user.id, 'code': self.code, 'url': self.url}
+        )
+
+        mock_email_class.assert_called_once_with(
+            subject="Reset your Password",
+            body='<p>reset email html</p>',
+            from_email=settings.EMAIL_FROM,
+            to=[self.user.email]
+        )
+
+        mock_email_instance.send.assert_called_once()
+
+
+class IsOwnerOrAdminTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner = CustomUser.objects.create_user(username='owner', email='owner@test.com', password='pass')
+        self.other = CustomUser.objects.create_user(username='other', email='other@test.com', password='pass')
+        self.admin = CustomUser.objects.create_superuser(username='admin', email='admin@test.com', password='pass')
+        self.permission = IsOwnerOrAdmin()
+
+    def test_safe_method_allows_anyone(self):
+        request = self.factory.get('/')
+        request.user = self.other
+        self.assertTrue(self.permission.has_object_permission(request, None, self.owner))
+
+    def test_owner_has_permission(self):
+        request = self.factory.post('/')
+        request.user = self.owner
+        self.assertTrue(self.permission.has_object_permission(request, None, self.owner))
+
+    def test_admin_has_permission(self):
+        request = self.factory.put('/')
+        request.user = self.admin
+        self.assertTrue(self.permission.has_object_permission(request, None, self.owner))
+
+    def test_other_user_denied(self):
+        request = self.factory.delete('/')
+        request.user = self.other
+        self.assertFalse(self.permission.has_object_permission(request, None, self.owner))

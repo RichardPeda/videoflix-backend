@@ -42,3 +42,4 @@ def send_password_reset_email_to_user(code, user_id):
     )
     email.content_subtype = "html" 
     email.send()
+

@@ -2,21 +2,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from userprofile.api.permissions import IsCustomerCreateReview, IsOwnerOrAdmin, IsReviewerOrAdmin
 from userprofile.api.serializers import RegistrationSerializer
 from userprofile.models import CustomUser, VerifyCode, PasswordResetCode
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
-from rest_framework import generics
 from rest_framework import status
-# from django_filters.rest_framework import DjangoFilterBackend
-# from django_filters import rest_framework as filters
-
-from rest_framework.filters import OrderingFilter
-# from django_filters.rest_framework import DjangoFilterBackend
-# from drf_spectacular.utils import extend_schema, extend_schema_serializer, inline_serializer
-from rest_framework import serializers
 from ..tasks import send_password_reset_email_to_user, send_verification_email_to_user
 
 class LoginOrSignupView(APIView):
