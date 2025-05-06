@@ -17,15 +17,10 @@ def movie_post_save(sender, instance, created, **kwargs):
         convertables, created = MovieConvertables.objects.get_or_create(movie=instance)
                
         convert120p.delay(instance.video_url.path, convertables.id)
-       
         convert360p.delay(instance.video_url.path, convertables.id)
-     
         convert720p.delay(instance.video_url.path, convertables.id)
-       
         convert1080p.delay(instance.video_url.path, convertables.id)
      
-        
-
 def check_convert_status(status, file):
     if type(status) is bool:
             print(f'file {file} already exists')

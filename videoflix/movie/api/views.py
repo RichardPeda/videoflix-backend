@@ -21,15 +21,25 @@ class MovieView(APIView):
 
       @method_decorator(cache_page(CACHE_TTL))
       def get(self, request):
-        
         """
-        This endpoint returns a all movies.
-        
+        Returns a list of all available movies.
+
+        This endpoint retrieves all movies from the database, ordered by creation date (newest first).
+        Authentication is required to access this resource. The response is cached for performance optimization.
+
         Args:
-            request (user): Authenticated user.
+            request (Request): Authenticated GET request with valid token.
 
         Returns:
-            JSON: Serialized offer.
+            Response (JSON):
+                - 200 OK:
+                    A list of movies, each represented as serialized JSON data.
+
+        Authentication:
+            Required – Token-based authentication
+
+        Permissions:
+            Only authenticated users (IsAuthenticated)
         """
         
         movies = Movie.objects.all()
@@ -41,6 +51,27 @@ class MovieConvertablesView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request):
+        """
+        Returns a list of all available movie convertables.
+
+        This endpoint retrieves all entries from the MovieConvertables model and returns them as serialized data.
+        Each convertable represents a video that has been uploaded and processed using ffmpeg.
+        During processing, the original video is converted and stored in multiple resolutions: 120p, 360p, 720p, and 1080p.
+
+        Args:
+            request (Request): Authenticated GET request with valid token.
+
+        Returns:
+            Response (JSON):
+                - 200 OK:
+                    A list of movie convertables, each represented as serialized JSON data.
+
+        Authentication:
+            Required – Token-based authentication
+
+        Permissions:
+            Only authenticated users (IsAuthenticated)
+        """
         convertables = MovieConvertables.objects.all()
         serializer = MovieConvertablesSerializer(convertables, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -50,6 +81,30 @@ class SingleMovieConvertablesView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request, pk):
+        """
+        Retrieves a single movie convertable by its ID.
+
+        This endpoint returns detailed information about a specific movie convertable, identified by its primary key (ID).
+        Each convertable represents a video that was uploaded and processed using FFmpeg.
+        During processing, the video is converted and saved in multiple resolutions: 120p, 360p, 720p, and 1080p.
+
+        Args:
+            request (Request): Authenticated GET request with valid token.
+            pk (int): Primary key (ID) of the movie convertable to retrieve.
+
+        Returns:
+            Response (JSON):
+                - 200 OK:
+                    A serialized representation of the requested movie convertable.
+                - 404 Not Found:
+                    If no convertable with the given ID exists.
+
+        Authentication:
+            Required – Token-based authentication
+
+        Permissions:
+            Only authenticated users (IsAuthenticated)
+        """
         try:
             convertables = MovieConvertables.objects.get(pk=pk)
             serializer = MovieConvertablesSerializer(convertables, context={'request': request})
@@ -59,6 +114,24 @@ class SingleMovieConvertablesView(APIView):
         
 class ConnectionTestView(APIView):
     def get(self, request):
+        """
+        Returns a test file used to verify connection or media access.
+
+        This endpoint is typically used to test client-server connectivity or to validate media streaming functionality.
+        It retrieves a predefined test file (with primary key 1) from the database and returns its serialized representation.
+
+        Args:
+            request (Request): GET request (authentication not required, unless enforced elsewhere).
+
+        Returns:
+            Response (JSON):
+                - 200 OK:
+                    A serialized representation of the test file.
+
+        Notes:
+            - This endpoint always retrieves the file with `pk=1`.
+            - Useful for connection checks, media playback testing, or system diagnostics.
+        """
         testfile = ConnectionTestFile.objects.get(pk=1)
         serializer = TestFileSerializer(testfile, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -67,34 +140,108 @@ class MovieProgressView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        try: 
-            req_user_id = request.user
-            progress = MovieProgress.objects.filter(user=req_user_id)
-            serializer = MovieProgressSerializer(progress, many=True)
-            return Response(serializer.data)
-        except:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        """
+        Retrieves the movie watch progress for the authenticated user.
+
+        This endpoint returns a list of progress entries that track how far the current user has watched each movie.
+        It is useful for implementing resume/playback position features in a video platform.
+
+        Args:
+            request (Request): Authenticated GET request with valid token.
+
+        Returns:
+            Response (JSON):
+                - 200 OK:
+                    A list of movie progress entries for the current user.
+                - 204 No Content:
+                    If no progress entries are found or an unexpected error occurs.
+
+        Authentication:
+            Required – Token-based authentication
+
+        Permissions:
+            Only authenticated users (IsAuthenticated)
+
+        Notes:
+            - Each progress entry typically includes information such as movie ID and timestamp/position.
+            - Consider handling specific exceptions (e.g. database errors) instead of a bare `except` for clearer error diagnostics.
+        """
+        progress = MovieProgress.objects.filter(user=request.user)
+        serializer = MovieProgressSerializer(progress, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MovieProgressSingleView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    def get(self, request, pk):
-        try: 
-            req_user_id = request.user
-            progress = MovieProgress.objects.get(movie=pk, user=req_user_id)
+    def get(self, request, pk): 
+        """
+        Retrieves the movie watch progress for a specific movie and the authenticated user.
+
+        This endpoint returns the progress entry for the given movie, allowing the user to resume playback 
+        from their last watched position.
+
+        Args:
+            request (Request): Authenticated GET request with valid token.
+            pk (int): Primary key (ID) of the movie.
+
+        Returns:
+            Response (JSON):
+                - 200 OK:
+                    A serialized progress entry with the last watched timestamp.
+                - 204 No Content:
+                    If no progress entry exists for this movie/user combination.
+
+        Authentication:
+            Required – Token-based authentication
+
+        Permissions:
+            Only authenticated users (IsAuthenticated)
+        """
+        progress = MovieProgress.objects.filter(movie=pk, user=request.user).first()
+        if progress:
             serializer = MovieProgressSerializer(progress)
-            return Response(serializer.data)
-        except:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
     def post(self,request, pk):
+        """
+        Creates or updates the user's watch progress for a specific movie.
+
+        This endpoint stores the current playback time for a movie, so that the user can resume 
+        watching later from the same position.
+
+        Args:
+            request (Request): Authenticated POST request with JSON body:
+                - time (int or float): The current playback position in seconds.
+            pk (int): Primary key (ID) of the movie.
+
+        Returns:
+            Response:
+                - 201 Created:
+                    If the progress was successfully created or updated.
+                - 400 Bad Request:
+                    If the 'time' field is missing or invalid.
+
+        Authentication:
+            Required – Token-based authentication
+
+        Permissions:
+            Only authenticated users (IsAuthenticated)
+        """
         req_time = request.data.get('time')
-        req_user_id = request.user
-        movie = Movie.objects.get(pk=pk)
-        
-        progress, created = MovieProgress.objects.get_or_create(movie=movie, user=req_user_id)
+
+        if req_time is None:
+            return Response({'error': 'Time is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            movie = Movie.objects.get(pk=pk)
+        except Movie.DoesNotExist:
+            return Response({'error': 'Movie not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        progress, created = MovieProgress.objects.get_or_create(movie=movie, user=request.user)
         progress.time = req_time
         progress.save()
+
         return Response(status=status.HTTP_201_CREATED)
         
        
