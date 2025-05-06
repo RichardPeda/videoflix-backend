@@ -75,12 +75,25 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_spectacular',
     'rest_framework.authtoken',
     'django_celery_results',
     'debug_toolbar',
     'movie.apps.MovieConfig',
     'userprofile'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Videoflix API',
+    'DESCRIPTION': 'This is the API for the corresponding Videoflix App',
+    'VERSION': '1.0.0',
+    'CONTACT': {'name': 'Richard Peda', 'url' : 'https://richard-peda.de', 'email': 'contact@richard-peda.de'},
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',

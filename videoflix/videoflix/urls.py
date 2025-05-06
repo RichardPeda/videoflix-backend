@@ -25,6 +25,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from movie.api.views import ConnectionTestView, MovieView, MovieConvertablesView, SingleMovieConvertablesView, MovieProgressView, MovieProgressSingleView
 from userprofile.api.views import LoginOrSignupView, LoginView, RegisterView, VerificationView, PasswordResetInquiryView, PasswordReset
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -44,6 +45,12 @@ urlpatterns = [
 
     path('api/movie-progress/', MovieProgressView.as_view(), name='movie-progress'),
     path('api/single-movie-progress/<int:pk>', MovieProgressSingleView.as_view(), name='single-movie-progress'),
+    # Automatisches OpenAPI-Schema (JSON)
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+
+    # Swagger UI mit drf-spectacular
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+
 
 ] + debug_toolbar_urls()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
