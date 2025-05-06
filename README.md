@@ -4,12 +4,19 @@ A RESTful API backend for a video streaming platform with features like user reg
 
 ---
 
+## Videoflix Frontend
+  
+ You can find the corresponding frontend application here:
+ [Videoflix-Frontend-App](https://github.com/RichardPeda/videoflix-frontend)
+
+---
+
 ## ⚙️ Technologies Used
 
 - **Python**, **Django**, **Django REST Framework**
 - **drf-spectacular** for OpenAPI (Swagger) documentation
-- **FFmpeg** for video processing
-- **Celery + Redis** for asynchronous email tasks and video convert
+- **ffmpeg** for video processing
+- **Celery + Redis** for asynchronous email tasks and video conversion
 - **TokenAuthentication** for secured endpoints
 
 ---
@@ -35,7 +42,20 @@ You have to install the latest Python version on your computer.
 
 ## Documentation
 The documentation of the endpoints was made with SwaggerUi.
-With your local server running, you can find it at the endpoint: [/api/docs/](http://127.0.0.1:8000/api/docs/)
+Once your local server is running, you can find it at the endpoint: [/api/docs/](http://127.0.0.1:8000/api/docs/)
+
+---
+
+## 👩‍💻 Admin Functionality
+
+Once logged into the [Django admin panel](http://localhost:8000/admin/), administrators can:
+
+- Upload original video files
+- Manage users and verification codes
+- Trigger automated video conversion (120p, 360p, 720p, 1080p)  
+> Videos are processed via ffmpeg after upload and made available in multiple resolutions.
+
+---
 
 ## 🚀 API Endpoints Overview
 
@@ -56,11 +76,11 @@ With your local server running, you can find it at the endpoint: [/api/docs/](ht
 | Method | Endpoint                        | Description                                                       |
 |--------|----------------------------------|-------------------------------------------------------------------|
 | GET    | `/movies/`                       | Returns a list of all movies (ordered by creation date)           |
-| GET    | `/convertables/`                 | Returns all uploaded videos converted via FFmpeg                  |
+| GET    | `/convertables/`                 | Returns all uploaded videos converted via ffmpeg                  |
 | GET    | `/convertables/<id>/`            | Returns a specific converted video's details                      |
 | GET    | `/connection_test/`              | Returns a test file to verify media/connection functionality      |
 
-> ⚙️ Each "convertable" video is processed into 120p, 360p, 720p, and 1080p versions via FFmpeg.
+> ⚙️ Each "convertable" video is processed into 120p, 360p, 720p, and 1080p versions via ffmpeg.
 
 ---
 
@@ -83,8 +103,3 @@ Interactive API documentation is available at:
 
 ---
 
-# Videoflix API
- This is the API of Videoflix App written with Django 5.1.
- 
- You can download the corresponding frontend app of Videoflix
- [Videoflix-Frontend-App](https://github.com/RichardPeda/videoflix-frontend)
