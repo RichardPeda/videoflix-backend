@@ -35,10 +35,10 @@ You have to install the latest Python version on your computer.
  ```
  pip install -r requirements.txt
 ```
- 3. Go to the folder "Videoflix_backend"
- 4. Generate the database with command `python manage.py migrate`
- 5. Run the command `python manage.py createsuperuser` to have access to the admin page
- 6. Run the command `python manage.py runserver` to start the app on your machine
+ 5. Go to the folder "Videoflix_backend"
+ 6. Generate the database with command `python manage.py migrate`
+ 7. Run the command `python manage.py createsuperuser` to have access to the admin page
+ 8. Run the command `python manage.py runserver` to start the app on your machine
 
 ## Documentation
 The documentation of the endpoints was made with SwaggerUi.
