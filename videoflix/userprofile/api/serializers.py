@@ -48,7 +48,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         """
         Save a new user after the validation of the fields.
         """
-
         pw = self.validated_data['password']
         email = self.validated_data['email']
         username = self.validated_data['username']        
