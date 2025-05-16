@@ -11,15 +11,30 @@ from celery import shared_task
 
 @receiver(post_save, sender=Movie)
 def movie_post_save(sender, instance, created, **kwargs):
-    if instance.video_url:  
-        duration = get_duration(instance.video_url)
-        Movie.objects.filter(pk=instance.pk).update(duration=duration)
-        convertables, created = MovieConvertables.objects.get_or_create(movie=instance)
-               
-        convert120p.delay(instance.video_url.path, convertables.id)
-        convert360p.delay(instance.video_url.path, convertables.id)
-        convert720p.delay(instance.video_url.path, convertables.id)
-        convert1080p.delay(instance.video_url.path, convertables.id)
+    
+    if created and instance.video_url:
+        process_video(instance)
+
+    elif not created:
+        try:
+            previous = Movie.objects.get(pk=instance.pk)
+        except Movie.DoesNotExist:
+            previous = None
+
+        if previous and previous.video_url != instance.video_url and instance.video_url:
+            process_video(instance)
+
+def process_video(instance: Movie):
+    """Helper zum Ermitteln der Dauer und Starten der Konvertierung"""
+    duration = get_duration(instance.video_url)
+    Movie.objects.filter(pk=instance.pk).update(duration=duration)
+
+    convertables, _ = MovieConvertables.objects.get_or_create(movie=instance)
+
+    convert120p.delay(instance.video_url.path, convertables.id)
+    convert360p.delay(instance.video_url.path, convertables.id)
+    convert720p.delay(instance.video_url.path, convertables.id)
+    convert1080p.delay(instance.video_url.path, convertables.id)
      
 def check_convert_status(status, file):
     if type(status) is bool:

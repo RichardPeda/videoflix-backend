@@ -19,7 +19,7 @@ class MovieView(APIView):
       authentication_classes = [TokenAuthentication]
       permission_classes = [IsAuthenticated]
 
-      @method_decorator(cache_page(CACHE_TTL))
+    #   @method_decorator(cache_page(CACHE_TTL))
       def get(self, request):
         """
         Returns a list of all available movies.
