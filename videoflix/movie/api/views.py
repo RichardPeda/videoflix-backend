@@ -67,7 +67,7 @@ class MovieConvertablesView(APIView):
                     A list of movie convertables, each represented as serialized JSON data.
 
         Authentication:
-            Required – Token-based authentication
+            Required - Token-based authentication
 
         Permissions:
             Only authenticated users (IsAuthenticated)
@@ -100,7 +100,7 @@ class SingleMovieConvertablesView(APIView):
                     If no convertable with the given ID exists.
 
         Authentication:
-            Required – Token-based authentication
+            Required - Token-based authentication
 
         Permissions:
             Only authenticated users (IsAuthenticated)
@@ -192,7 +192,7 @@ class MovieProgressSingleView(APIView):
                     If no progress entry exists for this movie/user combination.
 
         Authentication:
-            Required – Token-based authentication
+            Required - Token-based authentication
 
         Permissions:
             Only authenticated users (IsAuthenticated)
@@ -223,7 +223,7 @@ class MovieProgressSingleView(APIView):
                     If the 'time' field is missing or invalid.
 
         Authentication:
-            Required – Token-based authentication
+            Required - Token-based authentication
 
         Permissions:
             Only authenticated users (IsAuthenticated)
