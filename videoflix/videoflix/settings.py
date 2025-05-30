@@ -14,59 +14,28 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 load_dotenv()
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ywrh*5#za%au7t7$#^sz(*q6_776fv$8(f0b#vaxghlu7d9ydl'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost','127.0.0.1']
+SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-ywrh*5#za%au7t7$#^sz(*q6_776fv$8(f0b#vaxghlu7d9ydl')
+DEBUG = os.getenv('DEBUG')
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", default="localhost").split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", default="http://localhost:4200").split(",")
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", default="http://localhost:4200").split(",")
 CORS_ALLOW_ALL_ORIGINS = True
-
-CSRF_TRUSTED_ORIGINS = [
-
-  'http://127.0.0.1:5500',
-
-  'http://localhost:5500',
-  'http://127.0.0.1:4200',
-
-  'http://localhost:4200',
-
-]
-
-CORS_ALLOWED_ORIGINS = [
-
-  'http://127.0.0.1:5500',
-
-  'http://localhost:5500',
-  'http://127.0.0.1:4200',
-
-  'http://localhost:4200',
-
-]
-
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-FRONTEND_BASEURL = 'http://localhost:4200/'
+FRONTEND_BASEURL = os.getenv('FRONTEND_BASEURL')
 
 CACHE_TTL = 60 * 15
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -91,13 +60,16 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'Videoflix API',
     'DESCRIPTION': 'This is the API for the corresponding Videoflix App',
     'VERSION': '1.0.0',
-    'CONTACT': {'name': 'Richard Peda', 'url' : 'https://richard-peda.de', 'email': 'contact@richard-peda.de'},
+    'CONTACT': {'name': os.getenv('SPECTACULAR_SETTINGS_NAME'),
+                'url' : os.getenv('SPECTACULAR_SETTINGS_URL'),
+                'email': os.getenv('SPECTACULAR_SETTINGS_EMAIL')},
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -111,12 +83,12 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'videoflix.urls'
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.getenv('VIDEOFLIX_EMAIL_HOST')
-EMAIL_FROM = 'videoflix@richard-peda.de'
-EMAIL_HOST_USER = 'videoflix@richard-peda.de'
-EMAIL_HOST_PASSWORD = os.getenv('VIDEOFLIX_EMAIL_PW')
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_FROM = os.getenv('DEFAULT_FROM_EMAIL')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
 
 
 TEMPLATES = [
@@ -138,31 +110,28 @@ TEMPLATES = [
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": os.environ.get("REDIS_LOCATION", default="redis://redis:6379/1"),
         "OPTIONS": {
-        "PASSWORD": "foobared",
-        "CLIENT_CLASS": "django_redis.client.DefaultClient"
-    },
-    "KEY_PREFIX": "videoflix"
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "videoflix"
     }
 }
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME", default="videoflix_db"),
+        "USER": os.environ.get("DB_USER", default="videoflix_user"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", default="supersecretpassword"),
+        "HOST": os.environ.get("DB_HOST", default="db"),
+        "PORT": os.environ.get("DB_PORT", default=5432)
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -183,27 +152,25 @@ AUTH_USER_MODEL = 'userprofile.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "static"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'redis://:foobared@localhost:6379/0'
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', default='redis://redis:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', default='django-db')

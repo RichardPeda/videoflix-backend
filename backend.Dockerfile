@@ -8,15 +8,17 @@ WORKDIR /app
 
 COPY . .
 
-RUN apk update && \
-    apk add --no-cache --upgrade bash && \
-    apk add --no-cache postgresql-client && \
-    apk add --no-cache  && \
-    apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev ffmpeg && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    apk del .build-deps && \
-    chmod +x backend.entrypoint.sh
+
+
+RUN apk update
+RUN apk add --no-cache --upgrade bash
+RUN apk add --no-cache postgresql-client
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev
+RUN apk add --no-cache ffmpeg
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+RUN apk del .build-deps
+RUN chmod +x backend.entrypoint.sh
 
 EXPOSE 8000
 

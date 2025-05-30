@@ -1,11 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
-
 from .forms import MovieAdminForm
-
 from .models import Movie, MovieConvertables, ConnectionTestFile, MovieProgress
-
-# Register your models here.
 
 
 admin.site.register(MovieConvertables)
@@ -16,7 +12,7 @@ admin.site.register(MovieProgress)
 class MovieAdmin(admin.ModelAdmin):
     form = MovieAdminForm
     list_display = ('id', 'title', 'genre', 'rating', 'ranking', 'thumbnail_preview')
-    readonly_fields = ('thumbnail_preview', 'image_url')
+    readonly_fields = ('thumbnail_preview', 'image_url', 'duration')
 
     def thumbnail_preview(self, obj):
         if obj.image_url:

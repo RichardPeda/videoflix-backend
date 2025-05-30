@@ -20,6 +20,7 @@ __pycache__
 dist
 docs
 env
+env_lin
 venv
 logs
 src/{{ project_name }}/settings/local.py
