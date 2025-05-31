@@ -6,6 +6,8 @@ import subprocess
 import os
 from celery import shared_task
 from django.core.files.base import ContentFile
+from django.conf import settings
+
 
 
 @receiver(post_save, sender=Movie)
@@ -142,7 +144,8 @@ def convert120p(file_path, convertables_id):
         subprocess.run(cmd, capture_output=True, shell=True)
     try:
         convertable = MovieConvertables.objects.get(pk=convertables_id)
-        convertable.video_120p = new_file_name
+        relative_path = os.path.relpath(new_file_name, settings.MEDIA_ROOT)
+        convertable.video_120p = relative_path
         convertable.save()
     except MovieConvertables.DoesNotExist:
         pass
@@ -181,7 +184,8 @@ def convert360p(file_path, convertables_id):
         subprocess.run(cmd, capture_output=True, shell=True)
     try:
         convertable = MovieConvertables.objects.get(pk=convertables_id)
-        convertable.video_360p = new_file_name
+        relative_path = os.path.relpath(new_file_name, settings.MEDIA_ROOT)
+        convertable.video_360p = relative_path
         convertable.save()
     except MovieConvertables.DoesNotExist:
         pass
@@ -219,7 +223,8 @@ def convert720p(file_path, convertables_id):
         subprocess.run(cmd, capture_output=True, shell=True)
     try:
         convertable = MovieConvertables.objects.get(pk=convertables_id)
-        convertable.video_720p = new_file_name
+        relative_path = os.path.relpath(new_file_name, settings.MEDIA_ROOT)
+        convertable.video_720p = relative_path
         convertable.save()
     except MovieConvertables.DoesNotExist:
         pass
@@ -257,7 +262,8 @@ def convert1080p(file_path, convertables_id):
         subprocess.run(cmd, capture_output=True, shell=True)
     try:
         convertable = MovieConvertables.objects.get(pk=convertables_id)
-        convertable.video_1080p = new_file_name
+        relative_path = os.path.relpath(new_file_name, settings.MEDIA_ROOT)
+        convertable.video_1080p = relative_path
         convertable.save()
     except MovieConvertables.DoesNotExist:
         pass
