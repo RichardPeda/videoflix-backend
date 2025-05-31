@@ -117,7 +117,7 @@ CACHES = {
 }
 
 WSGI_APPLICATION = 'videoflix.wsgi.application'
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DATABASES = {
     "default": {
