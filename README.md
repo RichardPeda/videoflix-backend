@@ -4,13 +4,6 @@ A RESTful API backend for a video streaming platform with features like user reg
 
 ---
 
-## Videoflix Frontend
-  
- You can find the corresponding frontend application here:
- [Videoflix-Frontend-App](https://github.com/RichardPeda/videoflix-frontend)
-
----
-
 ## ⚙️ Technologies Used
 
 - **Python**, **Django**, **Django REST Framework**
@@ -21,24 +14,68 @@ A RESTful API backend for a video streaming platform with features like user reg
 
 ---
 
-### Requirements
-You have to install the latest Python version on your computer.
-[Download Python](https://www.python.org/downloads/)
+## Deployment with Docker
+If you prefer to run the project using Docker instead of a local virtual environment, follow the steps below:
 
-## 🔧 Installation
+### Prerequisites
+ - Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
+ - Install Redis (https://redis.io/)
 
- 1. Clone this repository
- 2. Create a virtual environment `python -m venv env`
- 3. Activate the virtual environment `"env/Scripts/activate"`
- 4. then you can run
-    
- ```
- pip install -r requirements.txt
+### 🔧 Setup Instructions
+1. Clone this repository
+2. Use the `template.env` file in the root of the project and change it´s name to `.env`.
+   Or use following command to create the `.env` file.
+
+```bash
+cp .env.template .env
 ```
- 5. Go to the folder "Videoflix_backend"
- 6. Generate the database with command `python manage.py migrate`
- 7. Run the command `python manage.py createsuperuser` to have access to the admin page
- 8. Run the command `python manage.py runserver` to start the app on your machine
+
+3. Build and start the project using `docker-compose`.
+
+```bash
+docker-compose up --build
+```
+
+This will automatically launch the following services from the Dockerfile:
+
+- Installs the PostgreSQL client tool (psql) to establish database connections
+- Installs temporary build dependencies to compile Python bindings and packages
+- Installs ffmpeg, which is required for video processing
+- Installs all dependencies for the django project from the requirements.txt
+- Defines the entrypoint for the container
+
+### Entrypoint.sh
+The script checks in a loop whether PostgreSQL is accessible.
+After that it runs important django commands:
+
+- collectstatic: Copies additional files in the project folder
+- makemigrations: Migrates the database
+- migrate: Applies all migrations (sets the DB to the current status)
+
+- Reads environment variables (such as DJANGO_SUPERUSER_USERNAME) and automatically creates an admin user if it does not already exist.
+- Starts the Celery Worker, which processes background jobs (e-mails, video conversion).
+- Starts the Django app with Gunicorn, a production-grade Python web server, accessible at port 8000.
+
+When the docker container is ready, the django app should be accessible under the following url: http://localhost:8000
+
+Admin Panel: http://localhost:8000/admin/
+
+Swagger API Docs: http://localhost:8000/api/docs/
+
+#### 🧹 Stop Containers
+To stop all running containers:
+
+```bash
+docker-compose down
+```
+
+To stop and remove all volumes:  
+❗**Warning: This command also removes the PostgreSQL database** ❗
+
+```bash
+docker-compose down -v
+```
+---
 
 ## Documentation
 The documentation of the endpoints was made with SwaggerUi.
@@ -50,10 +87,12 @@ Once your local server is running, you can find it at the endpoint: [/api/docs/]
 
 Once logged into the [Django admin panel](http://localhost:8000/admin/), administrators can:
 
-- Upload original video files
 - Manage users and verification codes
-- Trigger automated video conversion (120p, 360p, 720p, 1080p)  
-> Videos are processed via ffmpeg after upload and made available in multiple resolutions.
+- Upload original video files
+> Trigger automated video conversion (120p, 360p, 720p, 1080p)  
+> Videos are processed via ffmpeg after upload and made available in multiple resolutions.  
+> Thumbnail image is processed via ffmpeg after upload.  
+> Determines the duration of an uploaded video.
 
 ---
 
@@ -91,6 +130,14 @@ Once logged into the [Django admin panel](http://localhost:8000/admin/), adminis
 | GET    | `/progress/`                             | Returns all progress entries for the authenticated user         |
 | GET    | `/progress/<movie_id>/`                  | Returns progress for a specific movie                           |
 | POST   | `/progress/<movie_id>/`                  | Creates or updates the user's progress for the specified movie  |
+
+
+---
+
+## Videoflix Frontend
+  
+ You can find the corresponding frontend application here:
+ [Videoflix-Frontend-App](https://github.com/RichardPeda/videoflix-frontend)
 
 ---
 
