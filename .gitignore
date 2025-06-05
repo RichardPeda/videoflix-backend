@@ -5,9 +5,11 @@
 /env_lin
 */media
 */uploads
+
 db.sqlite3
 
 *.log
 *.pot
 *.pyc
 *__pycache__
+**/__pycache__/

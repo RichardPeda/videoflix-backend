@@ -29,8 +29,8 @@ class MovieViewTest(APITestCase):
             title='Testfilm',
             description='Mit Bild',
             genre='ACTION',
-            video_url=test_video,
-            image_url=test_image
+            video_file=test_video,
+            image_file=test_image
         )
         post_save.connect(receiver=movie_post_save, sender=Movie)
 
@@ -62,8 +62,8 @@ class MovieConvertablesViewTest(APITestCase):
             title='Testfilm',
             description='Mit Bild',
             genre='ACTION',
-            video_url=test_video,
-            image_url=test_image
+            video_file=test_video,
+            image_file=test_image
         )
         post_save.connect(receiver=movie_post_save, sender=Movie)
         self.convertables = MovieConvertables.objects.create(movie=movie)
@@ -95,8 +95,8 @@ class SingleMovieConvertablesViewTest(APITestCase):
             title='Testfilm',
             description='Mit Bild',
             genre='ACTION',
-            video_url=test_video,
-            image_url=test_image
+            video_file=test_video,
+            image_file=test_image
         )
         post_save.connect(receiver=movie_post_save, sender=Movie)
         self.convertables = MovieConvertables.objects.create(movie=self.movie)
@@ -135,8 +135,8 @@ class MovieProgressViewTest(APITestCase):
             title='Testfilm',
             description='Mit Bild',
             genre='ACTION',
-            video_url=test_video,
-            image_url=test_image
+            video_file=test_video,
+            image_file=test_image
         )
         post_save.connect(receiver=movie_post_save, sender=Movie)
         self.progress = MovieProgress.objects.create(user=self.user, movie=self.movie, time=42.0)
@@ -176,8 +176,8 @@ class MovieProgressSingleViewTest(APITestCase):
             title='Testfilm',
             description='Mit Bild',
             genre='ACTION',
-            video_url=test_video,
-            image_url=test_image
+            video_file=test_video,
+            image_file=test_image
         )
         post_save.connect(receiver=movie_post_save, sender=Movie)
         self.progress = MovieProgress.objects.create(user=self.user, movie=self.movie, time=42.0)
@@ -238,7 +238,7 @@ class MoviePostSaveSignalTest(TestCase):
             title='Signal Test Movie',
             description='Signal test desc',
             genre='ACTION',
-            video_url=video_file
+            video_file=video_file
         )
 
         # duration gesetzt?
@@ -249,7 +249,7 @@ class MoviePostSaveSignalTest(TestCase):
         self.assertTrue(MovieConvertables.objects.filter(movie=movie).exists())
 
         # Alle Konvertierungsjobs aufgerufen?
-        path = movie.video_url.path
+        path = movie.video_file.path
         convertables_id = MovieConvertables.objects.get(movie=movie).id
 
         mock_120.assert_called_once_with(path, convertables_id)

@@ -17,7 +17,7 @@ def movie_post_save(sender, instance, created, **kwargs):
 
     Behavior:
     - If a new Movie instance is created and has a video file, triggers the `process_video` function.
-    - If an existing Movie instance is updated and its `video_url` has changed to a new file,
+    - If an existing Movie instance is updated and its `video_file` has changed to a new file,
       also triggers the `process_video` function.
     - Prevents re-processing if the video file remains unchanged.
 
@@ -31,7 +31,7 @@ def movie_post_save(sender, instance, created, **kwargs):
     This ensures that video processing (conversion, thumbnail generation) happens automatically
     on creation or whenever the video file is changed.
     """    
-    if created and instance.video_url:
+    if created and instance.video_file:
         process_video(instance)
 
     elif not created:
@@ -40,7 +40,7 @@ def movie_post_save(sender, instance, created, **kwargs):
         except Movie.DoesNotExist:
             previous = None
 
-        if previous and previous.video_url != instance.video_url and instance.video_url:
+        if previous and previous.video_file != instance.video_file and instance.video_file:
             process_video(instance)
 
 def process_video(instance: Movie):
@@ -64,16 +64,16 @@ def process_video(instance: Movie):
     Example usage:
         process_video(movie_instance)
     """
-    duration = get_duration(instance.video_url)
+    duration = get_duration(instance.video_file)
     Movie.objects.filter(pk=instance.pk).update(duration=duration)
 
     convertables, _ = MovieConvertables.objects.get_or_create(movie=instance)
 
-    convert120p.delay(instance.video_url.path, convertables.id)
-    convert360p.delay(instance.video_url.path, convertables.id)
-    convert720p.delay(instance.video_url.path, convertables.id)
-    convert1080p.delay(instance.video_url.path, convertables.id)
-    generate_thumbnail.delay(instance.video_url.path, instance.pk)
+    convert120p.delay(instance.video_file.path, convertables.id)
+    convert360p.delay(instance.video_file.path, convertables.id)
+    convert720p.delay(instance.video_file.path, convertables.id)
+    convert1080p.delay(instance.video_file.path, convertables.id)
+    generate_thumbnail.delay(instance.video_file.path, instance.pk)
 
      
 def check_convert_status(status, file):
@@ -271,7 +271,7 @@ def convert1080p(file_path, convertables_id):
 @shared_task
 def generate_thumbnail(video_path, instance_id):
     """
-    Generates a WebP thumbnail from a video file using FFmpeg and saves it to the `image_url`
+    Generates a WebP thumbnail from a video file using FFmpeg and saves it to the `image_file`
     field of the corresponding Movie model instance.
 
     This task performs the following steps:
@@ -311,7 +311,7 @@ def generate_thumbnail(video_path, instance_id):
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         image_data = result.stdout
         content_file = ContentFile(image_data)
-        instance.image_url.save(thumb_filename, content_file, save=True)
+        instance.image_file.save(thumb_filename, content_file, save=True)
 
     except subprocess.CalledProcessError as e:
         print("FFmpeg error:", e.stderr.decode())

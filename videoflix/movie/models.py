@@ -21,13 +21,13 @@ class Movie(models.Model):
 ]
 
     title = models.CharField(max_length=30)
-    description = models.CharField(max_length=500)
+    description = models.TextField(max_length=500)
     genre = models.CharField(max_length=30, choices=GENRE_CHOICES, default="NEW")
-    rating = models.IntegerField(choices=RATING_CHOICES, default=12)
+    rating = models.IntegerField(choices=RATING_CHOICES, default=12, verbose_name="Rating (FSK)")
     ranking = models.DecimalField(decimal_places=1, max_digits=2,validators=[MinValueValidator(0.0), MaxValueValidator(5.0)], default=0.0)
     duration = models.FloatField(default=0.0)
-    image_url = models.FileField(upload_to='uploads/thumbnails/', null=True, blank=True)
-    video_url = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
+    image_file = models.FileField(upload_to='uploads/thumbnails/', null=True, blank=True)
+    video_file = models.FileField(upload_to='uploads/videos/', null=True, blank=True)
     created_at = models.DateTimeField(default=now)
 
     def __str__(self):

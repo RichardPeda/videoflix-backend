@@ -2,17 +2,17 @@ from rest_framework import serializers
 from movie.models import ConnectionTestFile, Movie, MovieConvertables, MovieProgress
 
 class MovieSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField(method_name='get_image_url')   
+    image_file = serializers.SerializerMethodField(method_name='get_image_file')   
     
     class Meta:
         model = Movie
-        exclude = ['video_url']
+        exclude = ['video_file']
                 
-    def get_image_url(self, obj):
+    def get_image_file(self, obj):
         request = self.context.get('request')
         if request:
-            return request.build_absolute_uri(obj.image_url.url)
-        return obj.image_url.url
+            return request.build_absolute_uri(obj.image_file.url)
+        return obj.image_file.url
         
 class MovieDetailSerializer(serializers.ModelSerializer):
     class Meta:
