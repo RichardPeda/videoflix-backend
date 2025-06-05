@@ -76,6 +76,8 @@ class LoginView(ObtainAuthToken):
                         'user_id': user.pk,
                         'email': user.email,
                     }, status=status.HTTP_200_OK)
+                else:
+                    return Response(status=status.HTTP_401_UNAUTHORIZED)
             else:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -120,7 +122,7 @@ class RegisterView(APIView):
             'message': 'verification email was sent'
             }, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message' : 'Please check your entries and try again'}, status=status.HTTP_400_BAD_REQUEST)
 
 class VerificationView(APIView):
     permission_classes = [AllowAny]
@@ -160,7 +162,7 @@ class VerificationView(APIView):
             
             return Response({'message' : 'user verified'}, status=status.HTTP_200_OK)
         except VerifyCode.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'message' : 'Please check your entries and try again'},status=status.HTTP_404_NOT_FOUND)
 
 class PasswordResetInquiryView(APIView):
     permission_classes = [AllowAny]
@@ -197,8 +199,7 @@ class PasswordResetInquiryView(APIView):
             code, created = PasswordResetCode.objects.get_or_create(user=user)
             send_password_reset_email_to_user.delay(user_id=user.pk, code=code.id)
         except CustomUser.DoesNotExist:
-            pass # Intentionally no error message → Protection against hackers
-        # Uniform response - even if the e-mail does not exist
+            pass 
         return Response({'message': 'If an account with that email exists, a reset email was sent.'}, status=status.HTTP_200_OK)
         
 class PasswordReset(APIView):

@@ -18,8 +18,9 @@ A RESTful API backend for a video streaming platform with features like user reg
 If you prefer to run the project using Docker instead of a local virtual environment, follow the steps below:
 
 ### Prerequisites
- - Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
- - Install Redis (https://redis.io/)
+ - Install [Git](https://git-scm.com/)
+ - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+ - Install [Redis](https://redis.io/)
 
 ### 🔧 Setup Instructions
 1. Clone this repository

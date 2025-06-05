@@ -3,8 +3,23 @@ from datetime import timedelta
 from django.utils.timezone import now
 from django.contrib.auth.models import AbstractUser
 import uuid 
+from django.core.validators import RegexValidator
 class CustomUser(AbstractUser):
-    is_verified = models.BooleanField(default=False)  
+    is_verified = models.BooleanField(default=False)
+
+    username_validator = RegexValidator(
+        regex=r'^[\w.@+\- ]+$',
+        message='Enter a valid username. This value may contain only letters, numbers, spaces, and @/./+/-/_ characters.',
+    )
+
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        validators=[username_validator],
+        error_messages={
+            'unique': "A user with that username already exists.",
+        },
+    )
 class VerifyCode(models.Model):
      id = models.UUIDField( 
          primary_key = True, 

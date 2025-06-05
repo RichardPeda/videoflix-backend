@@ -132,9 +132,12 @@ class ConnectionTestView(APIView):
             - This endpoint always retrieves the file with `pk=1`.
             - Useful for connection checks, media playback testing, or system diagnostics.
         """
-        testfile = ConnectionTestFile.objects.get(pk=1)
-        serializer = TestFileSerializer(testfile, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            testfile = ConnectionTestFile.objects.get(pk=1)
+            serializer = TestFileSerializer(testfile, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 class MovieProgressView(APIView):
     authentication_classes = [TokenAuthentication]
