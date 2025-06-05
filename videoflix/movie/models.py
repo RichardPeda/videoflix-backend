@@ -6,7 +6,6 @@ from userprofile.models import CustomUser
 
 class Movie(models.Model):
     GENRE_CHOICES = {
-        "NEW": "New",
         "ACTION": "Action",
         "DOCUMENTARY": "Documentary",
         "ROMANTIC": "Romantic",
