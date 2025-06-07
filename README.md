@@ -57,7 +57,8 @@ DB_USER=your_database_user,               # default database user
 DB_PASSWORD=your_database_password,       # default database password
 DB_HOST=db,          
 DB_PORT=5432
-FRONTEND_BASEURL="http://localhost:4200/" # customize this url, if an email has been sent, this url will be referenced
+FRONTEND_BASEURL="http://localhost:4200/" # customize this url. If an registration email
+                                          # has been sent, this url will be referenced
 
 # redis settings:
 REDIS_HOST=redis
