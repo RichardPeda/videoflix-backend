@@ -31,6 +31,56 @@ If you prefer to run the project using Docker instead of a local virtual environ
 cp .env.template .env
 ```
 
+#### `.env`
+
+This are default values used in settings.py. For your application, the values should be changed to your needs.
+
+- The database creates automatically a superuser with default name and password
+- Check the url of your allowed hosts
+- Change the database name and password for your needs
+- **Please check your login data of your email provider and whether tls and ssl are used** 
+
+
+```bash
+# Superuser settings:
+DJANGO_SUPERUSER_USERNAME=admin           # default superuser name
+DJANGO_SUPERUSER_PASSWORD=adminpassword   # default superuser password
+DJANGO_SUPERUSER_EMAIL=admin@example.com  # default superuser email
+
+# host settings:
+ALLOWED_HOSTS=localhost,127.0.0.1         # customize for your frontend application
+CSRF_TRUSTED_ORIGINS=http://localhost:4200,http://127.0.0.1:4200 # customize for your frontend application
+
+# database settings:
+DB_NAME=your_database_name,               # default database name
+DB_USER=your_database_user,               # default database user
+DB_PASSWORD=your_database_password,       # default database password
+DB_HOST=db,          
+DB_PORT=5432
+FRONTEND_BASEURL="http://localhost:4200/" # customize this url, if an email has been sent, this url will be referenced
+
+# redis settings:
+REDIS_HOST=redis
+REDIS_LOCATION=redis://redis:6379/1
+REDIS_PORT=6379                           # customize when you use different port
+REDIS_DB=0
+
+# email settings:
+EMAIL_HOST=smtp.example.com                  # customize to your host url
+EMAIL_PORT=587                               # customize to your email port
+EMAIL_HOST_USER=your_email_user              # customize to your email user
+EMAIL_HOST_PASSWORD=your_email_user_password # customize to your email password
+EMAIL_USE_TLS=True                           # check, if TLS is used
+EMAIL_USE_SSL=False                          # check, if SSL is used
+DEFAULT_FROM_EMAIL=default_from_email        # customize to your email
+
+# celery settings:
+CELERY_BROKER_URL='redis://redis:6379/0'
+CELERY_RESULT_BACKEND= 'django-db'
+```
+
+
+
 3. Build and start the project using `docker-compose`.
 
 ```bash
