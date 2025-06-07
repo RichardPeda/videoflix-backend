@@ -5,6 +5,23 @@ from django.contrib.auth import authenticate
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for registering a new user.
+
+    Validates that:
+    - The username is unique (case-insensitive).
+    - The email is unique (case-insensitive).
+    - The password and repeated_password match.
+
+    On save, creates a new CustomUser instance with the provided data,
+    sets the password securely, and initializes the user as inactive and unverified.
+
+    Fields:
+        - username: The desired username (unique).
+        - email: The user's email address (unique).
+        - password: The user's password (write-only).
+        - repeated_password: Confirmation of the password (write-only).
+    """
     email = serializers.EmailField(required=True)
     repeated_password = serializers.CharField(write_only=True)
     
@@ -44,9 +61,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return data
     
     def save(self):
-        """
-        Save a new user after the validation of the fields.
-        """
         pw = self.validated_data['password']
         email = self.validated_data['email']
         username = self.validated_data['username']        

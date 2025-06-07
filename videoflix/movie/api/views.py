@@ -16,32 +16,20 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 class MovieView(APIView):
-      authentication_classes = [TokenAuthentication]
-      permission_classes = [IsAuthenticated]
+    """
+    API view to retrieve a list of all movies.
 
-    #   @method_decorator(cache_page(CACHE_TTL))
-      def get(self, request):
-        """
-        Returns a list of all available movies.
+    Requires token authentication and user to be authenticated.
 
-        This endpoint retrieves all movies from the database, ordered by creation date (newest first).
-        Authentication is required to access this resource. The response is cached for performance optimization.
+    GET:
+        Returns a list of movies ordered by creation date descending.
+        Serialized using MovieSerializer with request context for full URLs.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
-        Args:
-            request (Request): Authenticated GET request with valid token.
-
-        Returns:
-            Response (JSON):
-                - 200 OK:
-                    A list of movies, each represented as serialized JSON data.
-
-        Authentication:
-            Required – Token-based authentication
-
-        Permissions:
-            Only authenticated users (IsAuthenticated)
-        """
-        
+#   @method_decorator(cache_page(CACHE_TTL))
+    def get(self, request):        
         movies = Movie.objects.all()
         movies = movies.order_by('-created_at')
         serializer = MovieSerializer(movies, many=True, context={'request': request})
